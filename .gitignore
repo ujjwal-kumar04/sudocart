@@ -1,0 +1,14 @@
+# Dependencies
+backend/node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/build/
+
+# Environment files
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example

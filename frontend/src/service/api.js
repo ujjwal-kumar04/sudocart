@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Swal from "sweetalert2";
-const URL = "http://localhost:8000";
+const URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 // Helper function to get JWT token from localStorage
 const getAuthToken = () => {
@@ -40,7 +40,7 @@ export const useCart = () => {
     }
 
     try {
-      await axios.post("http://localhost:8000/cart", {
+      await axios.post(`${URL}/cart`, {
         username,
         product,
       }, {
@@ -79,7 +79,7 @@ export const useWatchlist = () => {
     }
 
     try {
-      await axios.post("http://localhost:8000/watchlist", {
+      await axios.post(`${URL}/watchlist`, {
         username,
         product,
       }, {

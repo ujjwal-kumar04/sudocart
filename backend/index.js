@@ -8,7 +8,20 @@ const Routes = require('./router/route');
 dotenv.config();
 const app = express();
 
-app.use(cors());
+const allowedOrigins = (process.env.CLIENT_URLS || '')
+	.split(',')
+	.map((origin) => origin.trim())
+	.filter(Boolean);
+
+app.use(cors({
+	origin: (origin, callback) => {
+		if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+			return callback(null, true);
+		}
+		return callback(new Error('Not allowed by CORS'));
+	},
+	credentials: true
+}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
