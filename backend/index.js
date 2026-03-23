@@ -8,20 +8,40 @@ const Routes = require('./router/route');
 dotenv.config();
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_URL || '')
+const normalizeOrigin = (value = '') => value.trim().replace(/\/$/, '').toLowerCase();
+
+const configuredOrigins = (process.env.CLIENT_URL || process.env.CLIENT_URLS || '')
 	.split(',')
-	.map((origin) => origin.trim())
+	.map((origin) => normalizeOrigin(origin))
 	.filter(Boolean);
 
-app.use(cors({
+// Keep production frontend as fallback so CORS is safe even when CLIENT_URL is missing/misconfigured.
+const fallbackOrigins = [
+	normalizeOrigin('https://shop-sudocart.vercel.app')
+];
+
+const allowedOrigins = new Set([...configuredOrigins, ...fallbackOrigins]);
+
+const corsOptions = {
 	origin: (origin, callback) => {
-		if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+		if (!origin) {
 			return callback(null, true);
 		}
-		return callback(new Error('Not allowed by CORS'));
+
+		const normalizedRequestOrigin = normalizeOrigin(origin);
+		if (allowedOrigins.has(normalizedRequestOrigin)) {
+			return callback(null, true);
+		}
+
+		return callback(new Error(`Not allowed by CORS: ${origin}`));
 	},
-	credentials: true
-}));
+	credentials: true,
+	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
