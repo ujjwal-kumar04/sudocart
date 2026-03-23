@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Swal from "sweetalert2";
-const URL = process.env.REACT_APP_API_URL || "https://sudocart.onrender.com";
+const URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 export const API_BASE_URL = URL;
 
