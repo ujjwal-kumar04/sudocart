@@ -11,10 +11,18 @@ const isLocalFrontend = isBrowser && (
   window.location.hostname === '127.0.0.1'
 );
 
-let URL = envApiUrl || (isLocalFrontend ? LOCAL_API_URL : PROD_API_URL);
+const isAbsoluteHttpUrl = /^https?:\/\//i.test(envApiUrl);
+
+let URL = isAbsoluteHttpUrl
+  ? envApiUrl
+  : (isLocalFrontend ? LOCAL_API_URL : PROD_API_URL);
+
+const normalizedUrl = URL.replace(/\/$/, '');
+const currentOrigin = isBrowser ? window.location.origin.replace(/\/$/, '') : '';
+const isSelfOrigin = isBrowser && normalizedUrl === currentOrigin;
 
 // Safety: never allow deployed frontend to call loopback API endpoints.
-if (!isLocalFrontend && /localhost|127\.0\.0\.1/i.test(URL)) {
+if (!isLocalFrontend && (/localhost|127\.0\.0\.1/i.test(URL) || isSelfOrigin)) {
   URL = PROD_API_URL;
 }
 
