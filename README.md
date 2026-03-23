@@ -17,7 +17,7 @@ npm start
 2. Create `.env` and set:
 
 ```env
-REACT_APP_API_URL=http://localhost:8000
+REACT_APP_API_URL=https://sudocart.onrender.com
 ```
 
 3. Install packages and run:

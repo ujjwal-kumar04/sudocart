@@ -1,24 +1,24 @@
 
 
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Add, Delete, Remove } from "@mui/icons-material";
 import {
-  Box,
-  Paper,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Avatar,
-  IconButton
+    Avatar,
+    Box,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
 } from "@mui/material";
- import Swal from "sweetalert2";
-import { Delete, Add, Remove } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { deleteCartItem, getCartByUsername, updateCartItemQuantity } from "../service/api";
 
 const CartPage = ({username}) => {
   const [cartItems, setCartItems] = useState([]);
@@ -45,7 +45,7 @@ const CartPage = ({username}) => {
     const fetchCart = async () => {
       const username = user.username || user.email || user.mobile;
       try {
-        const res = await axios.get(`http://localhost:8000/cart/${username}`);
+        const res = await getCartByUsername(username);
         setCartItems(res.data);
       } catch (err) {
         console.error("Error fetching cart:", err);
@@ -57,7 +57,7 @@ const CartPage = ({username}) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/cart/${id}`);
+      await deleteCartItem(id);
       setCartItems(cartItems.filter((item) => item._id !== id));
     } catch (err) {
       console.error("Failed to delete item:", err);
@@ -67,9 +67,7 @@ const CartPage = ({username}) => {
   const handleQuantityChange = async (id, newQty) => {
     if (newQty < 1) return;
     try {
-      const res = await axios.put(`http://localhost:8000/cart/${id}`, {
-        quantity: newQty,
-      });
+      const res = await updateCartItemQuantity(id, newQty);
       setCartItems(
         cartItems.map((item) =>
           item._id === id ? { ...item, quantity: res.data.quantity } : item

@@ -1,7 +1,7 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
+import { getProductByIdForSeller, updateProduct } from '../service/api';
 import './ProductForm.css';
 
 function EditProduct() {
@@ -46,9 +46,7 @@ function EditProduct() {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      const response = await axios.get(`http://localhost:8000/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await getProductByIdForSeller(id, token);
       
       setFormData({
         name: response.data.name,
@@ -136,9 +134,7 @@ function EditProduct() {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      const response = await axios.put(`http://localhost:8000/api/products/${id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await updateProduct(id, formData, token);
       
       alert(response.data.message);
       navigate('/seller/dashboard');

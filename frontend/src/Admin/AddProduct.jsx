@@ -1,7 +1,7 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
+import { createProduct } from '../service/api';
 import './ProductForm.css';
 
 function AddProduct() {
@@ -189,9 +189,7 @@ function AddProduct() {
       }
       
       console.log('Submitting product data:', dataToSubmit);
-      const response = await axios.post('http://localhost:8000/api/products', dataToSubmit, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await createProduct(dataToSubmit, token);
       
       alert(response.data.message);
       navigate('/seller/dashboard');

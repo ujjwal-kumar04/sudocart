@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginSeller } from '../service/api';
 import './Loginpage.css';
 
 function Sellerlogin() {
@@ -14,7 +14,7 @@ function Sellerlogin() {
     setError('');
     
     try {
-      const response = await axios.post('http://localhost:8000/seller/login', {
+      const response = await loginSeller({
         username,
         password
       });

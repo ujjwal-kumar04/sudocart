@@ -60,7 +60,7 @@ const handleLogin = async (credentials) => {
 // Token के साथ API call करें
 const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
 
-axios.get('http://localhost:8000/userinfo', {
+axios.get('https://sudocart.onrender.com/userinfo', {
   headers: {
     'Authorization': `Bearer ${token}`
   }
@@ -132,7 +132,7 @@ Response: {
 
 ### Test Registration:
 ```bash
-curl -X POST http://localhost:8000/register \
+curl -X POST https://sudocart.onrender.com/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test User",
@@ -146,7 +146,7 @@ curl -X POST http://localhost:8000/register \
 
 ### Test Login:
 ```bash
-curl -X POST http://localhost:8000/login \
+curl -X POST https://sudocart.onrender.com/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "test@example.com",
@@ -156,7 +156,7 @@ curl -X POST http://localhost:8000/login \
 
 ### Test Protected Route:
 ```bash
-curl -X GET http://localhost:8000/userinfo \
+curl -X GET https://sudocart.onrender.com/userinfo \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 

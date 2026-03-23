@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { deleteProduct, getSellerAnalytics, getSellerOrderAnalytics, getSellerProducts } from '../service/api';
 import './userinfo.css';
 
 function SellerDashboard() {
@@ -28,14 +28,10 @@ function SellerDashboard() {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      };
-
       // Fetch products and analytics first
       const [productsRes, analyticsRes] = await Promise.all([
-        axios.get('http://localhost:8000/api/seller/products', config),
-        axios.get('http://localhost:8000/api/seller/analytics', config)
+        getSellerProducts(token),
+        getSellerAnalytics(token)
       ]);
 
       setProducts(productsRes.data);
@@ -43,7 +39,7 @@ function SellerDashboard() {
 
       // Fetch order analytics separately with error handling
       try {
-        const orderAnalyticsRes = await axios.get('http://localhost:8000/api/seller/order-analytics', config);
+        const orderAnalyticsRes = await getSellerOrderAnalytics(token);
         setOrderAnalytics(orderAnalyticsRes.data);
       } catch (orderError) {
         console.error('Error fetching order analytics:', orderError);
@@ -73,9 +69,7 @@ function SellerDashboard() {
       try {
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         const token = loggedInUser?.token;
-        await axios.delete(`http://localhost:8000/api/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await deleteProduct(productId, token);
         alert('Product deleted successfully');
         fetchSellerData();
       } catch (error) {

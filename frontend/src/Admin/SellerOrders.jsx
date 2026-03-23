@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getSellerOrders, updateSellerOrderItemStatus } from '../service/api';
 import './SellerOrders.css';
 
 function SellerOrders() {
@@ -29,9 +29,7 @@ function SellerOrders() {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      const response = await axios.get('http://localhost:8000/api/seller/orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await getSellerOrders(token);
       setOrders(response.data);
       setLoading(false);
     } catch (error) {
@@ -47,11 +45,7 @@ function SellerOrders() {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      await axios.put(
-        `http://localhost:8000/api/seller/order/${orderId}/item/${itemIndex}/status`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await updateSellerOrderItemStatus(orderId, itemIndex, newStatus, token);
       
       alert(`Order status updated to ${newStatus}`);
       fetchOrders(); // Refresh orders

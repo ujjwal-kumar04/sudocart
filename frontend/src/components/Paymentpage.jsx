@@ -11,10 +11,10 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import axios from "axios";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { createOrder } from "../service/api";
 
 const UPIPaymentPage = () => {
   const location = useLocation();
@@ -63,7 +63,7 @@ const UPIPaymentPage = () => {
     };
 
     try {
-      await axios.post("http://localhost:8000/order", orderData);
+      await createOrder(orderData);
       Swal.fire({
         toast: true,
         position: "top",

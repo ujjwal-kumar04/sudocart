@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  Box,
-  Paper,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Avatar,
-  Button,
-  Divider,
-  IconButton
-} from "@mui/material";
 import { Delete } from "@mui/icons-material";
+import {
+    Avatar,
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Paper,
+    Typography
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { addCartItem, deleteWatchlistItem, getWatchlistByUsername } from "../service/api";
 
 const WatchlistPage = ({username}) => {
   const [watchlist, setWatchlist] = useState([]);
@@ -39,7 +39,7 @@ const WatchlistPage = ({username}) => {
     const fetchWatchlist = async () => {
       const username = user.username || user.email || user.mobile;
       try {
-        const res = await axios.get(`http://localhost:8000/watchlist/${username}`);
+        const res = await getWatchlistByUsername(username);
         setWatchlist(res.data);
       } catch (err) {
         console.error("Error loading watchlist", err);
@@ -51,7 +51,7 @@ const WatchlistPage = ({username}) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/watchlist/${id}`);
+      await deleteWatchlistItem(id);
       setWatchlist(watchlist.filter((item) => item._id !== id));
     } catch (err) {
       console.error("Delete failed", err);
@@ -60,11 +60,11 @@ const WatchlistPage = ({username}) => {
   const handleMoveToCart = async (item) => {
     const username = user.username || user.email || user.mobile;
     try {
-      await axios.post("http://localhost:8000/cart", {
+      await addCartItem({
         username,
         product: { ...item, quantity: 1 },
       });
-      await axios.delete(`http://localhost:8000/watchlist/${item._id}`);
+      await deleteWatchlistItem(item._id);
       setWatchlist(watchlist.filter((w) => w._id !== item._id));
       
      Swal.fire({

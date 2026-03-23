@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
-  Box,
-  Typography,
-  Paper,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+    Box,
+    Divider,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import { getAllOrders } from "../service/api";
 
   import { useNavigate } from "react-router-dom";
   
@@ -33,7 +33,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/order/all");
+        const res = await getAllOrders();
         setOrders(res.data);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
