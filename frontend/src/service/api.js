@@ -1,6 +1,22 @@
 import axios from 'axios';
 import Swal from "sweetalert2";
-const URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
+const LOCAL_API_URL = "http://localhost:8000";
+const PROD_API_URL = "https://sudocart.onrender.com";
+
+const envApiUrl = (process.env.REACT_APP_API_URL || '').trim();
+const isBrowser = typeof window !== 'undefined';
+const isLocalFrontend = isBrowser && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+);
+
+let URL = envApiUrl || (isLocalFrontend ? LOCAL_API_URL : PROD_API_URL);
+
+// Safety: never allow deployed frontend to call loopback API endpoints.
+if (!isLocalFrontend && /localhost|127\.0\.0\.1/i.test(URL)) {
+  URL = PROD_API_URL;
+}
 
 export const API_BASE_URL = URL;
 
