@@ -17,7 +17,7 @@ const configuredOrigins = (process.env.CLIENT_URL || process.env.CLIENT_URLS || 
   .filter(Boolean);
 
 const fallbackOrigins = [
-  normalizeOrigin('https://shop-sudocart.vercel.app'),
+  normalizeOrigin('https://sudocart.netlify.app'),
   normalizeOrigin('http://localhost:3000')
 ];
 
