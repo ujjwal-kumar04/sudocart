@@ -26,11 +26,27 @@ if (!isLocalFrontend && (/localhost|127\.0\.0\.1/i.test(URL) || isSelfOrigin)) {
   URL = PROD_API_URL;
 }
 
+const normalizeBaseUrl = (value) => value.replace(/\/$/, '');
+URL = normalizeBaseUrl(URL);
+
 export const API_BASE_URL = URL;
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 20000
+});
+
+const getLoggedInUserData = () => {
+  try {
+    const rawUserData = localStorage.getItem("loggedInUser");
+    return rawUserData ? JSON.parse(rawUserData) : null;
+  } catch (error) {
+    return null;
+  }
+};
 
 // Helper function to get JWT token from localStorage
 const getAuthToken = () => {
-  const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+  const userData = getLoggedInUserData();
   return userData?.token;
 };
 
@@ -40,66 +56,66 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const addUser = (data) => axios.post(`${URL}/register`, data);
-export const loginUser = (data) => axios.post(`${URL}/login`, data);
-export const loginSeller = (data) => axios.post(`${URL}/seller/login`, data);
+export const loginUser = (data) => apiClient.post('/login', data);
+export const loginSeller = (data) => apiClient.post('/seller/login', data);
 export const getUserInfo = () => 
-  axios.get(`${URL}/userinfo`, { headers: getAuthHeaders() });
+  apiClient.get('/userinfo', { headers: getAuthHeaders() });
 
 // Product APIs
-export const getAllProducts = () => axios.get(`${URL}/api/products`);
-export const getProductById = (id) => axios.get(`${URL}/api/products/${id}`);
+export const addUser = (data) => apiClient.post('/register', data);
+export const getAllProducts = () => apiClient.get('/api/products');
+export const getProductById = (id) => apiClient.get(`/api/products/${id}`);
 export const getProductByIdForSeller = (id, token) =>
-  axios.get(`${URL}/api/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-export const getProductsByCategory = (category) => axios.get(`${URL}/api/products/category/${category}`);
-export const getProductsBySubcategory = (subcategory) => axios.get(`${URL}/api/products/subcategory/${subcategory}`);
+  apiClient.get(`/api/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+export const getProductsByCategory = (category) => apiClient.get(`/api/products/category/${category}`);
+export const getProductsBySubcategory = (subcategory) => apiClient.get(`/api/products/subcategory/${subcategory}`);
 export const getProductsByCategoryAndSubcategory = (category, subcategory) => 
-  axios.get(`${URL}/api/products/category/${category}/subcategory/${subcategory}`);
-export const getRandomProducts = (count = 12) => axios.get(`${URL}/api/products/random/${count}`);
+  apiClient.get(`/api/products/category/${category}/subcategory/${subcategory}`);
+export const getRandomProducts = (count = 12) => apiClient.get(`/api/products/random/${count}`);
 export const createProduct = (data, token) =>
-  axios.post(`${URL}/api/products`, data, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.post('/api/products', data, { headers: { Authorization: `Bearer ${token}` } });
 export const updateProduct = (id, data, token) =>
-  axios.put(`${URL}/api/products/${id}`, data, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.put(`/api/products/${id}`, data, { headers: { Authorization: `Bearer ${token}` } });
 export const deleteProduct = (id, token) =>
-  axios.delete(`${URL}/api/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.delete(`/api/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
 
 // Cart APIs
 export const addCartItem = (payload, token) =>
-  axios.post(`${URL}/cart`, payload, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-export const getCartByUsername = (username) => axios.get(`${URL}/cart/${username}`);
-export const deleteCartItem = (id) => axios.delete(`${URL}/cart/${id}`);
+  apiClient.post('/cart', payload, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+export const getCartByUsername = (username) => apiClient.get(`/cart/${username}`);
+export const deleteCartItem = (id) => apiClient.delete(`/cart/${id}`);
 export const updateCartItemQuantity = (id, quantity) =>
-  axios.put(`${URL}/cart/${id}`, { quantity });
+  apiClient.put(`/cart/${id}`, { quantity });
 
 // Watchlist APIs
 export const addWatchlistItem = (payload, token) =>
-  axios.post(`${URL}/watchlist`, payload, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-export const getWatchlistByUsername = (username) => axios.get(`${URL}/watchlist/${username}`);
-export const deleteWatchlistItem = (id) => axios.delete(`${URL}/watchlist/${id}`);
+  apiClient.post('/watchlist', payload, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+export const getWatchlistByUsername = (username) => apiClient.get(`/watchlist/${username}`);
+export const deleteWatchlistItem = (id) => apiClient.delete(`/watchlist/${id}`);
 
 // Order APIs
-export const createOrder = (data) => axios.post(`${URL}/order`, data);
-export const getAllOrders = () => axios.get(`${URL}/order/all`);
+export const createOrder = (data) => apiClient.post('/order', data);
+export const getAllOrders = () => apiClient.get('/order/all');
 
 // Seller APIs
 export const getSellerProducts = (token) =>
-  axios.get(`${URL}/api/seller/products`, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.get('/api/seller/products', { headers: { Authorization: `Bearer ${token}` } });
 export const getSellerAnalytics = (token) =>
-  axios.get(`${URL}/api/seller/analytics`, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.get('/api/seller/analytics', { headers: { Authorization: `Bearer ${token}` } });
 export const getSellerOrderAnalytics = (token) =>
-  axios.get(`${URL}/api/seller/order-analytics`, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.get('/api/seller/order-analytics', { headers: { Authorization: `Bearer ${token}` } });
 export const getSellerOrders = (token) =>
-  axios.get(`${URL}/api/seller/orders`, { headers: { Authorization: `Bearer ${token}` } });
+  apiClient.get('/api/seller/orders', { headers: { Authorization: `Bearer ${token}` } });
 export const updateSellerOrderItemStatus = (orderId, itemIndex, status, token) =>
-  axios.put(
-    `${URL}/api/seller/order/${orderId}/item/${itemIndex}/status`,
+  apiClient.put(
+    `/api/seller/order/${orderId}/item/${itemIndex}/status`,
     { status },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
 export const useCart = () => {
   const addToCart = async (product) => {
-    const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+    const userData = getLoggedInUserData();
     const username = userData?.user?.username || userData?.user?.email || userData?.user?.mobile;
     const token = userData?.token;
 
@@ -136,7 +152,7 @@ export const useCart = () => {
 };
 export const useWatchlist = () => {
   const addToWatchlist = async (product) => {
-    const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+    const userData = getLoggedInUserData();
     const username = userData?.user?.username || userData?.user?.email || userData?.user?.mobile;
     const token = userData?.token;
 

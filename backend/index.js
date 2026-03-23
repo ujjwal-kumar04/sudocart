@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const Connection = require('./database/db');
 const Routes = require('./router/route');
@@ -18,6 +17,7 @@ const configuredOrigins = (process.env.CLIENT_URL || process.env.CLIENT_URLS || 
 
 const fallbackOrigins = [
   normalizeOrigin('https://sudocart.netlify.app'),
+  normalizeOrigin('https://shop-sudocart.vercel.app'),
   normalizeOrigin('http://localhost:3000')
 ];
 

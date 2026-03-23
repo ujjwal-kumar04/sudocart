@@ -14,10 +14,10 @@ npm start
 
 ### Frontend
 1. Go to `frontend`.
-2. Create `.env` and set:
+2. Create `.env` and set (for local backend):
 
 ```env
-REACT_APP_API_URL=https://sudocart.onrender.com
+REACT_APP_API_URL=http://localhost:8000
 ```
 
 3. Install packages and run:
@@ -42,7 +42,7 @@ Use this split setup:
 	- `MONGO_URI`
 	- `JWT_SECRET`
 	- `PORT=8000`
-	- `CLIENT_URLS=https://<your-frontend-domain>`
+	- `CLIENT_URL=https://<your-frontend-domain>`
 5. Deploy and copy backend URL, for example:
 	- `https://sudocart-api.onrender.com`
 
@@ -54,12 +54,12 @@ Use this split setup:
 4. Deploy.
 
 ### 3) Update CORS
-After frontend is deployed, set backend `CLIENT_URLS` to your exact frontend URL.
+After frontend is deployed, set backend `CLIENT_URL` to your exact frontend URL.
 
 If you have multiple frontend URLs, use comma-separated values:
 
 ```env
-CLIENT_URLS=https://your-app.vercel.app,https://www.yourdomain.com
+CLIENT_URL=https://your-app.vercel.app,https://www.yourdomain.com
 ```
 
 ## Important security note
