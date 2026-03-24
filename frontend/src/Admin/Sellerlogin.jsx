@@ -20,8 +20,13 @@ function Sellerlogin() {
       });
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem(
+          'loggedInUser',
+          JSON.stringify({
+            user: response.data.user,
+            token: response.data.token
+          })
+        );
         localStorage.setItem('userRole', 'seller');
         alert('Seller Login Successful!');
         navigate('/seller/dashboard');

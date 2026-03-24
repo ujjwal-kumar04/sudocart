@@ -18,7 +18,7 @@ function SellerOrders() {
     const userRole = loggedInUser?.user?.role;
     
     if (!token || userRole !== 'seller') {
-      navigate('/login');
+      navigate('/seller/login');
       return;
     }
 
@@ -36,8 +36,9 @@ function SellerOrders() {
       console.error('Error fetching orders:', error);
       if (error.response?.status === 401) {
         localStorage.clear();
-        navigate('/login');
+        navigate('/seller/login');
       }
+      setLoading(false);
     }
   };
 

@@ -17,7 +17,7 @@ function SellerDashboard() {
     const userRole = loggedInUser?.user?.role;
     
     if (!token || userRole !== 'seller') {
-      navigate('/login');
+      navigate('/seller/login');
       return;
     }
 
@@ -58,7 +58,7 @@ function SellerDashboard() {
       console.error('Error fetching seller data:', error);
       if (error.response?.status === 401) {
         localStorage.clear();
-        navigate('/login');
+        navigate('/seller/login');
       }
       setLoading(false);
     }
@@ -81,7 +81,7 @@ function SellerDashboard() {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/login');
+    navigate('/seller/login');
   };
 
   const getSellerInfo = () => {
