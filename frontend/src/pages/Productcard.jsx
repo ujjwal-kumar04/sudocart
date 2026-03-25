@@ -25,12 +25,11 @@ export default function Productcard({ products = [] }) {
         {products.map((item) => (
           <div className="product-card" key={item._id || item.id}>
             <div className="card-badges">
-              <span className="sale-badge">SALE</span>
               {item.discount && <span className="discount-chip">{item.discount}</span>}
             </div>
 
             <button className="wish-btn" onClick={() => addToWatchlist(item)} aria-label="Add to wishlist">
-              <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" alt="wishlist" />
+              <i className="fas fa-heart"></i>
             </button>
 
             <div className="product-image">
@@ -52,25 +51,25 @@ export default function Productcard({ products = [] }) {
                   })}
                 </span>
                 <span className="rating-text">
-                  ({normalizeRating(item.averageRating || item.rating).toFixed(1)}
-                  {item.totalReviews || item.reviewCount ? ` | ${(item.totalReviews || item.reviewCount).toLocaleString()} Reviews` : ' | Reviews'})
+                  {normalizeRating(item.averageRating || item.rating).toFixed(1)}
+                  {item.totalReviews || item.reviewCount ? ` | ${(item.totalReviews || item.reviewCount).toLocaleString()} reviews` : ''}
                 </span>
               </div>
 
               <div className="price-row">
-                <span className="price">${formatPrice(item.price)}</span>
-                {item.originalprice && <span className="original-price">${formatPrice(item.originalprice)}</span>}
+                <span className="price">₹{formatPrice(item.price)}</span>
+                {item.originalprice && <span className="original-price">₹{formatPrice(item.originalprice)}</span>}
               </div>
 
-              <div className="card-actions">
-                <button className="add-cart-btn" onClick={() => addToCart(item)}>
-                  <i className="fas fa-shopping-cart"></i> ADD TO CART
-                </button>
+              <div className="cta-row">
                 <button
-                  className="view-btn"
+                  className="buy-btn"
                   onClick={() => navigate(`/product/${item._id || item.id}`)}
                 >
-                  VIEW DETAILS
+                  Buy Now
+                </button>
+                <button className="cart-btn" onClick={() => addToCart(item)} aria-label="Add to cart">
+                  <i className="fas fa-shopping-cart"></i>
                 </button>
               </div>
             </div>
