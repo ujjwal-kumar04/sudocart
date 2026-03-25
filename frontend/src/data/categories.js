@@ -1,6 +1,7 @@
 export const categories = {
   "Fashion & Apparel": {
     icon: "👕",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Men Clothing",
       "Women Clothing",
@@ -11,6 +12,7 @@ export const categories = {
   },
   "Electronics": {
     icon: "📱",
+    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Mobiles & Smartphones",
       "Laptops & Computers",
@@ -23,6 +25,7 @@ export const categories = {
   },
   "Home & Living": {
     icon: "🏠",
+    image: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Furniture",
       "Home Decor",
@@ -33,6 +36,7 @@ export const categories = {
   },
   "Grocery & Daily Needs": {
     icon: "🍔",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Fruits & Vegetables",
       "Snacks & Beverages",
@@ -43,6 +47,7 @@ export const categories = {
   },
   "Beauty & Personal Care": {
     icon: "💄",
+    image: "https://images.unsplash.com/photo-1506617420156-8e4536971650?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Makeup",
       "Skincare",
@@ -53,6 +58,7 @@ export const categories = {
   },
   "Books & Stationery": {
     icon: "📚",
+    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Academic Books",
       "Novels",
@@ -63,6 +69,7 @@ export const categories = {
   },
   "Toys, Kids & Baby": {
     icon: "🧸",
+    image: "https://images.unsplash.com/photo-1601758174300-3f3e07d1d4c5?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Toys",
       "Baby Clothing",
@@ -72,6 +79,7 @@ export const categories = {
   },
   "Sports & Fitness": {
     icon: "🏋️",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Gym Equipment",
       "Sports Gear",
@@ -81,6 +89,7 @@ export const categories = {
   },
   "Automobile Accessories": {
     icon: "🚗",
+    image: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Bike Accessories",
       "Car Accessories",
@@ -90,6 +99,7 @@ export const categories = {
   },
   "Gaming & Entertainment": {
     icon: "🎮",
+    image: "https://images.unsplash.com/photo-1580128636820-81a46c2c91e7?auto=format&fit=crop&w=300&q=70",
     subcategories: [
       "Gaming Consoles",
       "Video Games",
@@ -101,6 +111,10 @@ export const categories = {
 
 export const getCategoryIcon = (category) => {
   return categories[category]?.icon || "📦";
+};
+
+export const getCategoryImage = (category) => {
+  return categories[category]?.image;
 };
 
 export const getSubcategories = (category) => {

@@ -1,0 +1,101 @@
+.feature-container {
+  width: 100%;
+  max-width: 1800px;
+  padding: 0 12px;
+  margin: 0 auto;
+}
+.feature-header {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  padding: 10px 20px;
+}
+.feature-header a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+.feature-header h2 {
+  font-size: 40px;
+  font-weight: 400;
+  color: black;
+  display: inline-block;
+  border-bottom: 4px solid #fdd835;
+}
+
+.product-section {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  gap: 25px;
+  padding: 20px 30px;
+  box-sizing: border-box;
+}
+
+.product-card {
+  width: 100%;
+  min-height: 400px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Responsive: 4 cards on medium screens */
+@media (max-width: 1600px) {
+  .product-section {
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Responsive: 3 cards on smaller screens */
+@media (max-width: 1200px) {
+  .product-section {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Responsive: 2 cards on tablets */
+@media (max-width: 900px) {
+  .feature-header {
+    gap: 14px;
+    padding: 8px 10px;
+  }
+
+  .feature-header h2 {
+    font-size: 28px;
+  }
+
+  .product-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    padding: 15px 20px;
+  }
+}
+
+/* Responsive: 1 card on mobile */
+@media (max-width: 600px) {
+  .feature-container {
+    padding: 0 6px;
+  }
+
+  .feature-header h2 {
+    font-size: 24px;
+  }
+
+  .product-section {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 10px 8px;
+  }
+}
+
+/* Remove default margin from body if any */

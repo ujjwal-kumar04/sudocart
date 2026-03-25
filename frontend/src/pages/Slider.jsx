@@ -1,33 +1,74 @@
-import logo from "../logo.svg";
-
-// Fallback images for slider
-const image = logo;
-const slider1 = logo;
-const slider3 = logo;
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { sliderImages } from "../data/sliderImages";
+import "./Slider.css";
 
 export default function Slider() {
+  const [current, setCurrent] = useState(0);
+  const slides = sliderImages && sliderImages.length ? sliderImages : [];
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!slides.length) return undefined;
+    const id = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [slides.length]);
+
+  const goTo = (index) => setCurrent((index + slides.length) % slides.length);
+  const handleShop = (category) => {
+    if (category) {
+      navigate('/Shop', { state: { category } });
+    }
+  };
+
   return (
-   <><div id="carouselExample" className="carousel slide">
-  <div className="carousel-inner">
-    <div className="carousel-item active">
-      <img src={image} className="d-block w-100" alt="Slide 1"/>
+    <div className="hero-slider">
+      <div
+        className="slider-track"
+        style={{ transform: `translateX(-${current * 100}%)` }}
+      >
+        {slides.map((slide, idx) => (
+          <div
+            key={slide.src}
+            className={`slide ${idx === current ? "active" : ""}`}
+            style={{ backgroundImage: `url(${slide.src})` }}
+            aria-label={slide.alt}
+          >
+            <div className="slide-overlay" />
+            <div className="slide-content">
+              <p className="slide-kicker">Trending now</p>
+              <h2 className="slide-title">{slide.alt}</h2>
+              <div className="slide-actions">
+                <button className="slide-cta" onClick={() => handleShop(slide.category)}>
+                  Shop {slide.category || 'now'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="slider-controls">
+        <button className="nav-btn" onClick={() => goTo(current - 1)} aria-label="Previous slide">
+          ‹
+        </button>
+        <button className="nav-btn" onClick={() => goTo(current + 1)} aria-label="Next slide">
+          ›
+        </button>
+      </div>
+
+      <div className="slider-dots">
+        {slides.map((_, idx) => (
+          <button
+            key={idx}
+            className={`dot ${idx === current ? "active" : ""}`}
+            onClick={() => goTo(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
     </div>
-    <div className="carousel-item">
-      <img src={slider1} className="d-block w-100" alt="Slide 2"/>
-    </div>
-    <div className="carousel-item">
-      <img src={slider3} className="d-block w-100" alt="Slide 3"/>
-    </div>
-  </div>
-  <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span className="visually-hidden">Previous</span>
-  </button>
-  <button className="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-    <span className="carousel-control-next-icon" aria-hidden="true"></span>
-    <span className="visually-hidden">Next</span>
-  </button>
-</div>
-   </>
-  )
+  );
 }

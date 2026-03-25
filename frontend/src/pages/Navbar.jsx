@@ -2,21 +2,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import logo from "../Assets/logo.png";
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
-import logo from "../logo.svg";
 import { getAllProducts } from "../service/api";
 
 import {
-    Box,
-    Button,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    Popover
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Popover
 } from "@mui/material";
 
 function Navbar() {
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [products, setProducts] = useState([]);
   const [authState, setAuthState] = useState(() => localStorage.getItem("loggedInUser"));
@@ -139,13 +140,16 @@ function Navbar() {
     navigate('/Shop', { state: { category, subcategory } });
     handleCategoryClose();
   };
+  const toggleMobileSearch = () => setShowMobileSearch((prev) => !prev);
 
   return (
     <>
       <nav className="navbar">
         <div className="navbar1">
-          <div className="logo"><img src={logo} alt="SudoCart logo"></img><h1>SudoCart</h1> </div>
-<div className="search1"></div>
+          <div className="logo">
+            <img src={logo} alt="SudoCart logo"></img><h5>SudoCart</h5>
+          </div>
+
           <div className="search-box">
             <input
               type="text"
@@ -158,8 +162,24 @@ function Navbar() {
             </button>
           </div>
 
+          {showMobileSearch && (
+            <div className="mobile-search-panel">
+              <input
+                type="text"
+                placeholder="Search product"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <button onClick={handleSearch}>Go</button>
+            </div>
+          )}
+
           {/* ICONS SECTION */}
           <div className="icons" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button className="mobile-search-btn" onClick={toggleMobileSearch} aria-label="Search">
+              <i className="fas fa-search"></i>
+            </button>
             {!isLoggedIn ? (
               <Button
                 variant="contained"
@@ -196,7 +216,7 @@ function Navbar() {
             </button>
 
             {/* Popover Menu Icon */}
-            <IconButton onClick={handleUserIconClick}>
+            <IconButton className="menu-toggle" onClick={handleUserIconClick}>
               <i className="fa-solid fa-bars" style={{ fontSize: "20px" }}></i>
             </IconButton>
           </div>
