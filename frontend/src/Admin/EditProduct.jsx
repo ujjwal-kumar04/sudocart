@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import { getProductByIdForSeller, updateProduct } from '../service/api';
-import './ProductForm.css';
 
 function EditProduct() {
   const [formData, setFormData] = useState({

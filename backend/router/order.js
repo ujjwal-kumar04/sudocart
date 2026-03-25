@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../schema/order-schema');
+const User = require('../schema/user-schema');
 const verifyToken = require('../middleware/authMiddleware');
 
 console.log("Order routes loaded");
@@ -32,6 +33,40 @@ router.get('/order/all', async (req, res) => {
   } catch (err) {
     console.error("Failed to get orders:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get logged in user's own orders
+router.get('/order/my', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('email mobile');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const identifiers = [user.email, user.mobile].filter(Boolean);
+
+    if (identifiers.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const orConditions = [];
+
+    identifiers.forEach((value) => {
+      orConditions.push({ username: value });
+      orConditions.push({ email: value });
+      orConditions.push({ mobile: value });
+    });
+
+    const orders = await Order.find({ $or: orConditions })
+      .sort({ createdAt: -1 })
+      .populate('cartItems.productId', 'name img');
+
+    return res.status(200).json(orders);
+  } catch (err) {
+    console.error('Failed to get user orders:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 });
 

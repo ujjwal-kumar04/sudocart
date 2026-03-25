@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../schema/product-schema');
+const Order = require('../schema/order-schema');
+const User = require('../schema/user-schema');
 const verifyToken = require('../middleware/authMiddleware');
 
 // Get all products
@@ -54,9 +56,11 @@ router.get('/api/products/category/:category/subcategory/:subcategory', async (r
 router.get('/api/products/random/:count', async (req, res) => {
   try {
     const count = parseInt(req.params.count) || 12;
-    const products = await Product.aggregate([
-      { $sample: { size: count } }
-    ]);
+    const products = await Product.find()
+      .populate('seller', 'name email shopName')
+      .sort({ createdAt: -1 })
+      .limit(count)
+      .lean();
     res.status(200).json(products);
   } catch (error) {
     console.log("Get Random Products Error:", error);
@@ -195,6 +199,103 @@ router.get('/api/seller/analytics', verifyToken, async (req, res) => {
   } catch (error) {
     console.log("Analytics Error:", error);
     res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+// Add product review (buyer can review only delivered items)
+router.post('/api/products/:id/reviews', verifyToken, async (req, res) => {
+  try {
+    const { id: productId } = req.params;
+    const { rating, comment, orderId, itemIndex } = req.body;
+
+    const numericRating = Number(rating);
+    const parsedItemIndex = Number(itemIndex);
+
+    if (!orderId || Number.isNaN(parsedItemIndex)) {
+      return res.status(400).json({ message: 'orderId and itemIndex are required' });
+    }
+
+    if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const user = await User.findById(req.userId).select('name email mobile');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const identifiers = [user.email, user.mobile].filter(Boolean);
+    const ownershipConditions = [];
+    identifiers.forEach((value) => {
+      ownershipConditions.push({ username: value });
+      ownershipConditions.push({ email: value });
+      ownershipConditions.push({ mobile: value });
+    });
+
+    if (ownershipConditions.length === 0) {
+      return res.status(403).json({ message: 'Unable to verify order ownership' });
+    }
+
+    const order = await Order.findOne({
+      _id: orderId,
+      $or: ownershipConditions
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found for this user' });
+    }
+
+    const orderItem = order.cartItems[parsedItemIndex];
+    if (!orderItem) {
+      return res.status(400).json({ message: 'Invalid itemIndex for this order' });
+    }
+
+    const orderProductId = orderItem.productId?.toString();
+    if (!orderProductId || orderProductId !== productId) {
+      return res.status(400).json({ message: 'This item does not match the selected product' });
+    }
+
+    if (orderItem.status !== 'Delivered') {
+      return res.status(400).json({ message: 'Review allowed only after delivery' });
+    }
+
+    if (orderItem.reviewed) {
+      return res.status(409).json({ message: 'Review already submitted for this delivered item' });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const safeComment = typeof comment === 'string' ? comment.trim().slice(0, 500) : '';
+
+    product.reviews.push({
+      user: req.userId,
+      userName: user.name || 'Verified Buyer',
+      orderId: order._id,
+      rating: numericRating,
+      comment: safeComment
+    });
+
+    const ratingCount = product.reviews.length;
+    const ratingTotal = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+    product.ratingCount = ratingCount;
+    product.ratingAverage = ratingCount ? Number((ratingTotal / ratingCount).toFixed(1)) : 0;
+
+    orderItem.reviewed = true;
+    orderItem.reviewedAt = new Date();
+
+    await Promise.all([product.save(), order.save()]);
+
+    return res.status(201).json({
+      message: 'Review submitted successfully',
+      ratingAverage: product.ratingAverage,
+      ratingCount: product.ratingCount
+    });
+  } catch (error) {
+    console.log('Add review error:', error);
+    return res.status(500).json({ message: 'Something went wrong' });
   }
 });
 

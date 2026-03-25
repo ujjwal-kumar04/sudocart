@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginSeller } from '../service/api';
-import './Loginpage.css';
 
 function Sellerlogin() {
   const [username, setUsername] = useState('');

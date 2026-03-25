@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteProduct, getSellerAnalytics, getSellerOrderAnalytics, getSellerProducts } from '../service/api';
-import './userinfo.css';
 
 function SellerDashboard() {
   const [products, setProducts] = useState([]);

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 // export default App;
-import { Route, Routes } from "react-router-dom";
+import { useEffect } from 'react';
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
 import AboutPage from './Admin/AboutPage';
 import AddProduct from './Admin/AddProduct';
 import AdminLogin from './Admin/Adminlogin';
@@ -26,7 +28,41 @@ import Companyinfo from './pages/Companyinfo';
 import ContectSection from './pages/Contectsection';
 import Productdetail from "./pages/Productdetail";
 
-function App(props) {
+function RequireAuth({ children }) {
+  const location = useLocation();
+  const loggedInUserRaw = localStorage.getItem('loggedInUser');
+  let loggedInUser = null;
+
+  try {
+    loggedInUser = loggedInUserRaw ? JSON.parse(loggedInUserRaw) : null;
+  } catch (error) {
+    loggedInUser = null;
+  }
+
+  const isLoggedIn = Boolean(loggedInUser?.token && loggedInUser?.user);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'warning',
+        title: 'Please login first',
+        showConfirmButton: false,
+        timer: 1800,
+        timerProgressBar: true
+      });
+    }
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  return children;
+}
+
+function App() {
  const [loggedInUser, setLoggedInUser] = useState(() => {
     const saved = localStorage.getItem('loggedInUser');
     return saved ? JSON.parse(saved).user : null;
@@ -36,8 +72,15 @@ function App(props) {
       <Routes>
         <Route path="/" exact element={<Homepage />} />
         <Route path="/login" exact element={<Loginpage  setLoggedInUser={setLoggedInUser}/>} />
-        <Route path="/userinfo" element={<AboutPage user={loggedInUser} />} />
-        <Route path="/aboutus" exact element={<Companyinfo/>} />
+        <Route
+          path="/userinfo"
+          element={
+            <RequireAuth>
+              <AboutPage user={loggedInUser} />
+            </RequireAuth>
+          }
+        />
+        
         
         {/* Registration Routes */}
         <Route path="/register" exact element={<RegisterChoice />} />
@@ -49,9 +92,31 @@ function App(props) {
         <Route path="/Womenpage" exact element={<Womenpage />} />
         <Route path="/Kidspage" exact element={<Kidspage />} />
         <Route path="/product/:id" element={<Productdetail />} />
-        <Route path="/cart" exact element={<CartPage  user={loggedInUser}/>} />
-        <Route path="/watchlist" element={<WatchlistPage user={loggedInUser} />} />
-        <Route path="/checkout" element={<ProceedToPayPage/>}/>
+        <Route
+          path="/cart"
+          exact
+          element={
+            <RequireAuth>
+              <CartPage user={loggedInUser} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/watchlist"
+          element={
+            <RequireAuth>
+              <WatchlistPage user={loggedInUser} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <RequireAuth>
+              <ProceedToPayPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/admin" exact  element={<AdminLogin/>}/>
         <Route path="admin/orders" element={<AdminOrdersPage/>}></Route>
         <Route path="/payment" element={<Paymentpage />} />
@@ -70,30 +135,6 @@ function App(props) {
 
 
 
-// function App() {
-//   const [loggedInUser, setLoggedInUser] = useState(() => {
-//     const saved = localStorage.getItem('loggedInUser');
-//     return saved ? JSON.parse(saved).user : null;
-//   });
 
-//   return (
-//     <Routes>
-//       <Route path="/" exact element={<Homepage />} />
-//       <Route path="/login" element={<Loginpage setLoggedInUser={setLoggedInUser} />} />
-//       <Route path="/userinfo" element={<AboutPage user={loggedInUser} />} />
-//       <Route path="/register" element={<RegisterForm />} />
-//       <Route path="/Shop" element={<Shop />} />
-//       <Route path="/Menpage" element={<Menpage />} />
-//       <Route path="/Womenpage" element={<Womenpage />} />
-//       <Route path="/Kidspage" element={<Kidspage />} />
-//       <Route path="/product/:id" element={<Productdetail />} />
-//       <Route path="/cart" element={<CartPage user={loggedInUser} />} />
-//       <Route path="/watchlist" element={<WatchlistPage />} />
-//       <Route path="/checkout" element={<ProceedToPayPage />} />
-//       <Route path="/admin" element={<AdminLogin />} />
-//       <Route path="/admin/orders" element={<AdminOrdersPage />} />
-//     </Routes>
-//   );
-// }
 
 export default App;

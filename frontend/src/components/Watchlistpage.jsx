@@ -83,8 +83,8 @@ const WatchlistPage = ({username}) => {
 
 
   return (
-    <Box display="flex" justifyContent="center" mt={4}>
-      <Paper elevation={3} sx={{ padding: 4, width: 600 }}>
+    <Box display="flex" justifyContent="center" mt={{ xs: 2, md: 4 }} px={{ xs: 1, md: 0 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, width: { xs: '100%', md: 600 }, maxWidth: 760 }}>
         <Typography variant="h5" gutterBottom>
           Your Watchlist  
         </Typography>
@@ -96,6 +96,11 @@ const WatchlistPage = ({username}) => {
             {watchlist.map((item) => (
               <React.Fragment key={item._id}>
                 <ListItem
+                  sx={{
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    gap: { xs: 1, sm: 2 },
+                    flexWrap: { xs: 'wrap', sm: 'nowrap' }
+                  }}
                   secondaryAction={
                     <IconButton edge="end" onClick={() => handleDelete(item._id)} color="error">
                       <Delete />
@@ -107,7 +112,11 @@ const WatchlistPage = ({username}) => {
                   <Avatar sx={{
                     bgcolor: 'primary.main', width: 80, height: 100, fontSize: 20,borderRadius:4
                   }} variant="square" src={item.img} alt={item.name} />
-                  <ListItemText primary={item.name} secondary={`₹${item.price}`} />
+                  <ListItemText
+                    primary={item.name}
+                    secondary={`₹${item.price}`}
+                    sx={{ mr: { xs: 6, sm: 10 } }}
+                  />
                 <Button
   variant="contained"
   color="success"

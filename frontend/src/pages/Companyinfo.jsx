@@ -1,11 +1,9 @@
 // src/pages/Companyinfo.jsx
-import React from "react";
-import "./Companyinfo.css";
-import {useNavigate} from "react-router-dom"
-import lock from "../Assets/lock.png"
-import shipping from "../Assets/shipping.png"
-import badge from "../Assets/badge.png"
-import discount from "../Assets/discount.png"
+import { useNavigate } from "react-router-dom";
+import badge from "../Assets/badge.png";
+import discount from "../Assets/discount.png";
+import lock from "../Assets/lock.png";
+import shipping from "../Assets/shipping.png";
 // src/pages/Companyinfo.jsx
 
 

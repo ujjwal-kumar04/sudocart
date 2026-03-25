@@ -1,6 +1,5 @@
 import { Box, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import './RegisterChoice.css';
 
 function RegisterChoice() {
   const navigate = useNavigate();

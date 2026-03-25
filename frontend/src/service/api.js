@@ -96,6 +96,10 @@ export const deleteWatchlistItem = (id) => apiClient.delete(`/watchlist/${id}`);
 // Order APIs
 export const createOrder = (data) => apiClient.post('/order', data);
 export const getAllOrders = () => apiClient.get('/order/all');
+export const getMyOrders = () =>
+  apiClient.get('/order/my', { headers: getAuthHeaders() });
+export const submitProductReview = (productId, data) =>
+  apiClient.post(`/api/products/${productId}/reviews`, data, { headers: getAuthHeaders() });
 
 // Seller APIs
 export const getSellerProducts = (token) =>

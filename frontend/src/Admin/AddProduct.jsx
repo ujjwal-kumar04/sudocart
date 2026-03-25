@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import { createProduct } from '../service/api';
-import './ProductForm.css';
 
 function AddProduct() {
   const [formData, setFormData] = useState({

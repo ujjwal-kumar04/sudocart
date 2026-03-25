@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getSellerOrders, updateSellerOrderItemStatus } from '../service/api';
-import './SellerOrders.css';
 
 function SellerOrders() {
   const [orders, setOrders] = useState([]);

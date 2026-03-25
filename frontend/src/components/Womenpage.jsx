@@ -26,7 +26,7 @@ export default function Womenpage() {
     return (
       <>
         <Navbar/>
-        <div style={{margin:" 2px 10vh 5px 10vh", width:"90%", textAlign:"center"}}>
+        <div className="page-content" style={{ textAlign:"center" }}>
           <h2>Loading...</h2>
         </div>
       </>
@@ -36,7 +36,7 @@ export default function Womenpage() {
   return (
     <>
     <Navbar/>
-    <div style={{margin:" 2px 10vh 5px 10vh",width:"90%"}}>
+    <div className="page-content">
 
         <div className="header">
             <h2>Women's Fashion</h2>

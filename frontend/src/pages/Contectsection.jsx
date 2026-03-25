@@ -1,6 +1,4 @@
 // src/components/ContactSection.jsx
-import React from 'react';
-import "./ContectSection.css"
 
 const ContactSection = () => {
   return (

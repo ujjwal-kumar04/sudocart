@@ -27,6 +27,14 @@ const orderSchema = new mongoose.Schema({
         type: String, 
         enum: ['Ordered', 'Dispatched', 'Delivered', 'Cancelled'],
         default: 'Ordered'
+      },
+      reviewed: {
+        type: Boolean,
+        default: false
+      },
+      reviewedAt: {
+        type: Date,
+        default: null
       }
     }
   ],

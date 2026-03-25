@@ -1,9 +1,6 @@
 
-
-import "./Feature.css"
-
-import  men from "./menfashion.png"
-import  women from "./womenfashion.png"
+import men from "./menfashion.png"
+import women from "./womenfashion.png"
 
 export default function Feature() {
  

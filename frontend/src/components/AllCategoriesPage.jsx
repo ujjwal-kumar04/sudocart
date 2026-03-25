@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { getSubcategories } from '../data/categories';
 import Navbar from '../pages/Navbar';
 import Productcard from "../pages/Productcard";
@@ -10,7 +10,6 @@ export default function AllCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -48,11 +47,6 @@ export default function AllCategoriesPage() {
     return product.category === selectedCategory && product.subcategory === selectedSubcategory;
   });
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubcategory('All');
-  };
-
   if (loading) {
     return (
       <>
@@ -68,9 +62,9 @@ export default function AllCategoriesPage() {
   return (
     <>
       <Navbar/>
-      <div style={{margin: "2px 5vh 5px 5vh", width: "90%"}}>
+      <div className="page-content">
         <div style={{textAlign: 'center', marginBottom: '30px'}}>
-          <h1 style={{fontSize: '36px', color: '#495057'}}>🛍️ All Categories</h1>
+          <h1 style={{fontSize: 'clamp(24px, 4vw, 36px)', color: '#495057'}}>🛍️ All Categories</h1>
          
         </div>
 
@@ -83,7 +77,7 @@ export default function AllCategoriesPage() {
             justifyContent: 'center',
             flexWrap: 'wrap',
             margin: '20px 0',
-            padding: '15px',
+            padding: '12px',
             background: 'white',
             borderRadius: '10px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.05)'

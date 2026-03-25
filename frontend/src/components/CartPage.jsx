@@ -1,6 +1,3 @@
-
-
-
 import { Add, Delete, Remove } from "@mui/icons-material";
 import {
     Avatar,
@@ -20,20 +17,18 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { deleteCartItem, getCartByUsername, updateCartItemQuantity } from "../service/api";
 
-const CartPage = ({username}) => {
+const CartPage = ({ username }) => {
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
-  const user = username||JSON.parse(localStorage.getItem("loggedInUser"))?.user;
+  const user = username || JSON.parse(localStorage.getItem("loggedInUser"))?.user;
 
   useEffect(() => {
-  
-
     if (!user) {
       Swal.fire({
         toast: true,
-        position: 'top',
-        icon: 'warning',
-        title: 'Please login first',
+        position: "top",
+        icon: "warning",
+        title: "Please login first",
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true
@@ -43,9 +38,9 @@ const CartPage = ({username}) => {
     }
 
     const fetchCart = async () => {
-      const username = user.username || user.email || user.mobile;
+      const userNameOrEmail = user.username || user.email || user.mobile;
       try {
-        const res = await getCartByUsername(username);
+        const res = await getCartByUsername(userNameOrEmail);
         setCartItems(res.data);
       } catch (err) {
         console.error("Error fetching cart:", err);
@@ -83,129 +78,119 @@ const CartPage = ({username}) => {
   };
 
   return (
-    
-    <Box display="flex" justifyContent="center" mt={4}>
-  <Paper elevation={3} sx={{ padding: 4, width: 800 }}>
-    <Typography variant="h5" gutterBottom>
-      Your Cart
-    </Typography>
-
-    {cartItems.length === 0 ? (
-      <Typography variant="body1">Your cart is empty.</Typography>
-    ) : (
-      <>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Product</TableCell>
-                <TableCell align="center">Price</TableCell>
-                <TableCell align="center">Quantity</TableCell>
-                <TableCell align="center">Delete</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {cartItems.map((item) => (
-                <TableRow key={item._id}>
-                  <TableCell>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <Avatar
-                        src={item.img}
-                        alt={item.name}
-                        variant="square"
-                        sx={{ width: 70, height: 90 , borderRadius: 3}}
-                      />
-                      <Box>
-                        <Typography>{item.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                        
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </TableCell>
-
-                  <TableCell align="center">₹{item.price}</TableCell>
-
-                  <TableCell align="center">
-                    <Box display="flex" alignItems="center" justifyContent="center">
-                      <IconButton
-                        onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
-                        sx={{ color: 'green' }}
-                      >
-                        <Add />
-                      </IconButton>
-
-                      <Typography
-                        variant="body1"
-                        sx={{ mx: 1, minWidth: 20, textAlign: 'center' }}
-                      >
-                        {item.quantity}
-                      </Typography>
-
-                      <IconButton
-                        onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
-                        sx={{ color: 'orange' }}
-                      >
-                        <Remove />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(item._id)}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                        },
-                      }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Typography variant="h6" align="right" mt={2}>
-          Total: ₹{getTotal()}
+    <Box display="flex" justifyContent="center" mt={{ xs: 2, md: 4 }} px={{ xs: 1, md: 0 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, width: { xs: "100%", md: 800 }, maxWidth: 900 }}>
+        <Typography variant="h5" gutterBottom>
+          Your Cart
         </Typography>
-        <button
-    style={{
-      backgroundColor: '#2ecc71',
-      color: 'white',
-      border: 'none',
-      padding: '10px 20px',
-      borderRadius: '5px',
-      cursor: 'pointer',
-      fontWeight: 'bold'
-    }}
-    onClick={() =>
-      navigate("/checkout", {
-        state: {
-          cartItems,
-          totalAmount: getTotal(),
-          user
-        }
-      })
-    }
-  >
-    Proceed to Pay
-  </button>
-        
-      </>
-    )}
-  </Paper>
-  
-</Box>
 
+        {cartItems.length === 0 ? (
+          <Typography variant="body1">Your cart is empty.</Typography>
+        ) : (
+          <>
+            <TableContainer sx={{ overflowX: "auto" }}>
+              <Table sx={{ minWidth: 640 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Product</TableCell>
+                    <TableCell align="center">Price</TableCell>
+                    <TableCell align="center">Quantity</TableCell>
+                    <TableCell align="center">Delete</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {cartItems.map((item) => (
+                    <TableRow key={item._id}>
+                      <TableCell>
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <Avatar
+                            src={item.img}
+                            alt={item.name}
+                            variant="square"
+                            sx={{ width: 70, height: 90, borderRadius: 2 }}
+                          />
+                          <Typography>{item.name}</Typography>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell align="center">₹{item.price}</TableCell>
+
+                      <TableCell align="center">
+                        <Box display="flex" alignItems="center" justifyContent="center">
+                          <IconButton
+                            onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
+                            sx={{ color: "green" }}
+                          >
+                            <Add />
+                          </IconButton>
+
+                          <Typography variant="body1" sx={{ mx: 1, minWidth: 20, textAlign: "center" }}>
+                            {item.quantity}
+                          </Typography>
+
+                          <IconButton
+                            onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
+                            sx={{ color: "orange" }}
+                          >
+                            <Remove />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDelete(item._id)}
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "rgba(255, 0, 0, 0.1)"
+                            }
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Typography variant="h6" align="right" mt={2}>
+              Total: ₹{getTotal()}
+            </Typography>
+
+            <button
+              style={{
+                backgroundColor: "#2ecc71",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "bold",
+                width: "100%",
+                maxWidth: "280px",
+                marginTop: "10px"
+              }}
+              onClick={() =>
+                navigate("/checkout", {
+                  state: {
+                    cartItems,
+                    totalAmount: getTotal(),
+                    user
+                  }
+                })
+              }
+            >
+              Proceed to Pay
+            </button>
+          </>
+        )}
+      </Paper>
+    </Box>
   );
 };
 
 export default CartPage;
-
-
 

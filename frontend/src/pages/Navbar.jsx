@@ -1,26 +1,47 @@
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "../Assets/Slider/logo.png";
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import { getAllProducts } from "../service/api";
-import "./Navbar.css";
 
 import {
-  Box,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Popover
+    Box,
+    Button,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Popover
 } from "@mui/material";
 
 function Navbar() {
   const [searchName, setSearchName] = useState("");
   const [products, setProducts] = useState([]);
+  const [authState, setAuthState] = useState(() => localStorage.getItem("loggedInUser"));
   const navigate = useNavigate();
+
+  const isLoggedIn = (() => {
+    try {
+      if (!authState) return false;
+      const parsed = JSON.parse(authState);
+      return Boolean(parsed?.user && parsed?.token);
+    } catch (error) {
+      return false;
+    }
+  })();
+
+  useEffect(() => {
+    const syncAuthState = () => setAuthState(localStorage.getItem("loggedInUser"));
+    window.addEventListener("storage", syncAuthState);
+    window.addEventListener("focus", syncAuthState);
+
+    return () => {
+      window.removeEventListener("storage", syncAuthState);
+      window.removeEventListener("focus", syncAuthState);
+    };
+  }, []);
 
   useEffect(() => {
     fetchProducts();
@@ -66,7 +87,34 @@ function Navbar() {
   const handleClose = () => setAnchorEl(null);
   const open = Boolean(anchorEl);
 
+  const redirectToLoginFirst = () => {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      icon: 'warning',
+      title: 'Please login first',
+      showConfirmButton: false,
+      timer: 1800,
+      timerProgressBar: true
+    });
+    navigate('/login');
+  };
+
+  const handleProtectedNavigate = (path) => {
+    if (!isLoggedIn) {
+      redirectToLoginFirst();
+      return;
+    }
+    navigate(path);
+  };
+
   const handleOptionClick = (path) => {
+    if ((path === '/userinfo' || path === '/cart' || path === '/watchlist') && !isLoggedIn) {
+      redirectToLoginFirst();
+      handleClose();
+      return;
+    }
+
     navigate(path);
     handleClose();
   };
@@ -112,31 +160,40 @@ function Navbar() {
 
           {/* ICONS SECTION */}
           <div className="icons" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {/* Login Button */}
-          
-            <Button
-  variant="contained"
-  size="small"
-  onClick={() => navigate("/login")}
-  sx={{
-    textTransform: "none",
-    fontWeight: 800,
-    color: "black",
-    backgroundColor: "white",
-    border: "2px solid #ffe680",
-    '&:hover': {
-      backgroundColor: "#ffe680", // Slightly lighter on hover
-      borderColor: "#ffe680"
-    }
-  }}
->
-  Login
-</Button>
+            {!isLoggedIn ? (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => navigate("/login")}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 800,
+                  color: "black",
+                  backgroundColor: "white",
+                  border: "2px solid #ffe680",
+                  '&:hover': {
+                    backgroundColor: "#ffe680",
+                    borderColor: "#ffe680"
+                  }
+                }}
+              >
+                Login
+              </Button>
+            ) : (
+              <IconButton onClick={() => navigate('/userinfo')} title="Profile">
+                <i className="fas fa-user-circle" style={{ fontSize: "24px" }}></i>
+              </IconButton>
+            )}
 
             {/* Cart Icon */}
-            <Link to="/cart" style={{ color: "black" }}>
+            <button
+              type="button"
+              onClick={() => handleProtectedNavigate('/cart')}
+              style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', color: 'black' }}
+              aria-label="Cart"
+            >
               <i className="fas fa-shopping-cart" style={{ fontSize: "20px" }}></i>
-            </Link>
+            </button>
 
             {/* Popover Menu Icon */}
             <IconButton onClick={handleUserIconClick}>
@@ -263,6 +320,7 @@ function Navbar() {
               button
               onClick={() => {
                 localStorage.removeItem("loggedInUser");
+                setAuthState(null);
                 navigate("/login");
                 handleClose();
               }}

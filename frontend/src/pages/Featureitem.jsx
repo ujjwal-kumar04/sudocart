@@ -1,8 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { getAllCategories, getCategoryIcon } from "../data/categories";
 import { getRandomProducts } from "../service/api";
-import "./Featureitem.css";
 import Productcard from "./Productcard";
 
 export default function Featureitem() {
@@ -40,7 +38,7 @@ export default function Featureitem() {
 
   return (
     <div className="feature-container">
-       <div style={{margin:" 2px 10vh 5px 10vh",width:"90%"}}>
+       <div className="page-content" style={{ paddingTop: '6px' }}>
               <div className="header">
                   <h2>Feature Items</h2>
                   
@@ -57,24 +55,23 @@ export default function Featureitem() {
         <Productcard products={displayProducts} />
       </div>
 
-      <div className="view-all-section" style={{
-        textAlign: 'center',
-        margin: '40px 0',
-        padding: '20px'
-      }}>
-        <a href="/Shop" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '15px 30px',
-          background: '#2ecc71',
-          color: 'white',
-          borderRadius: '10px',
-          textDecoration: 'none',
-          fontSize: '16px',
-          fontWeight: '600',
-          transition: 'all 0.3s'
-        }}>
+      <div className="view-all-section" style={{ textAlign: 'center', margin: '30px 0', padding: '12px' }}>
+        <a
+          href="/Shop"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 22px',
+            background: '#2ecc71',
+            color: 'white',
+            borderRadius: '10px',
+            textDecoration: 'none',
+            fontSize: '15px',
+            fontWeight: '600',
+            transition: 'all 0.3s'
+          }}
+        >
           <i className="fas fa-th"></i> View All Products
         </a>
       </div>

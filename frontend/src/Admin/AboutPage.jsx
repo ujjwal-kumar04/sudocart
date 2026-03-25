@@ -2,18 +2,28 @@ import {
     Alert,
     Box,
     Button,
+    Card,
+    CardContent,
+    Chip,
     CircularProgress,
     Container,
     Paper,
+    Rating,
+    Stack,
+    TextField,
     Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserInfo } from '../service/api';
+import Swal from 'sweetalert2';
+import { getMyOrders, getUserInfo, submitProductReview } from '../service/api';
 
 const AboutPage = ({ username }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
+  const [deliveredItems, setDeliveredItems] = useState([]);
+  const [reviewDrafts, setReviewDrafts] = useState({});
+  const [reviewLoading, setReviewLoading] = useState(false);
   const navigate = useNavigate();
 
   const loggedInUser = username ||
@@ -24,8 +34,27 @@ const AboutPage = ({ username }) => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await getUserInfo();
-        setUser(res.data);
+        setReviewLoading(true);
+        const [userRes, ordersRes] = await Promise.all([
+          getUserInfo(),
+          getMyOrders()
+        ]);
+
+        setUser(userRes.data);
+
+        const flattenedDeliveredItems = ordersRes.data.flatMap((order) =>
+          (order.cartItems || [])
+            .map((item, itemIndex) => ({
+              ...item,
+              orderId: order._id,
+              itemIndex,
+              orderDate: order.createdAt
+            }))
+            .filter((item) => item.status === 'Delivered')
+        );
+
+        flattenedDeliveredItems.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        setDeliveredItems(flattenedDeliveredItems);
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           setError("Session expired. Please login again.");
@@ -37,10 +66,90 @@ const AboutPage = ({ username }) => {
           setError("Failed to load user info");
         }
         console.error(err);
+      } finally {
+        setReviewLoading(false);
       }
     };
     if (loggedInUser) fetchUserInfo();
   }, [loggedInUser, navigate]);
+
+  const getItemKey = (item) => `${item.orderId}-${item.itemIndex}`;
+
+  const handleDraftChange = (itemKey, nextValue) => {
+    setReviewDrafts((prev) => ({
+      ...prev,
+      [itemKey]: {
+        rating: 0,
+        comment: '',
+        ...prev[itemKey],
+        ...nextValue
+      }
+    }));
+  };
+
+  const handleSubmitReview = async (item) => {
+    const itemKey = getItemKey(item);
+    const draft = reviewDrafts[itemKey] || { rating: 0, comment: '' };
+
+    if (!draft.rating || draft.rating < 1) {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'warning',
+        title: 'Please select a rating',
+        showConfirmButton: false,
+        timer: 1800
+      });
+      return;
+    }
+
+    const productId = typeof item.productId === 'object' ? item.productId?._id : item.productId;
+
+    if (!productId) {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'error',
+        title: 'Product not found for review',
+        showConfirmButton: false,
+        timer: 1800
+      });
+      return;
+    }
+
+    try {
+      await submitProductReview(productId, {
+        orderId: item.orderId,
+        itemIndex: item.itemIndex,
+        rating: draft.rating,
+        comment: draft.comment
+      });
+
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'success',
+        title: 'Review submitted successfully',
+        showConfirmButton: false,
+        timer: 1800
+      });
+
+      setDeliveredItems((prev) => prev.map((lineItem) =>
+        getItemKey(lineItem) === itemKey
+          ? { ...lineItem, reviewed: true, reviewedAt: new Date().toISOString() }
+          : lineItem
+      ));
+    } catch (submitError) {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        icon: 'error',
+        title: submitError.response?.data?.message || 'Failed to submit review',
+        showConfirmButton: false,
+        timer: 2200
+      });
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");
@@ -56,7 +165,7 @@ const AboutPage = ({ username }) => {
         </Box>
       )}
       {user && (
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
           <Typography variant="h4" gutterBottom sx={{ color: '#000', borderBottom: '3px solid #ffe680', pb: 1 }}>
             {user.role === 'seller' ? '🏪 ' : '👤 '}Welcome, {user.name}
           </Typography>
@@ -147,6 +256,84 @@ const AboutPage = ({ username }) => {
               <Typography variant="body1" gutterBottom><strong>Account Number:</strong> {user.accountNumber}</Typography>
               <Typography variant="body1" gutterBottom><strong>IFSC Code:</strong> {user.ifscCode}</Typography>
               <Typography variant="body1" gutterBottom><strong>Bank Name:</strong> {user.bankName}</Typography>
+            </Box>
+          )}
+
+          {user.role !== 'seller' && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ color: '#000', fontWeight: 600, mb: 2, borderBottom: '2px solid #ffe680', pb: 1 }}>
+                ⭐ Delivered Orders - Review & Rating
+              </Typography>
+
+              {reviewLoading ? (
+                <Box display="flex" justifyContent="center" py={3}>
+                  <CircularProgress size={24} />
+                </Box>
+              ) : deliveredItems.length === 0 ? (
+                <Alert severity="info">No delivered products found yet. You can review products after delivery.</Alert>
+              ) : (
+                <Stack spacing={2}>
+                  {deliveredItems.map((item) => {
+                    const itemKey = getItemKey(item);
+                    const draft = reviewDrafts[itemKey] || { rating: 0, comment: '' };
+
+                    return (
+                      <Card key={itemKey} variant="outlined" sx={{ borderRadius: 2 }}>
+                        <CardContent>
+                          <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                            <Typography variant="subtitle1" fontWeight={700}>{item.name}</Typography>
+                            <Chip
+                              size="small"
+                              label={item.reviewed ? 'Reviewed' : 'Delivered'}
+                              color={item.reviewed ? 'success' : 'primary'}
+                              variant={item.reviewed ? 'filled' : 'outlined'}
+                            />
+                          </Box>
+
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                            Qty: {item.quantity} • Price: ₹{item.price} • Delivered on {new Date(item.orderDate).toLocaleDateString('en-IN')}
+                          </Typography>
+
+                          {!item.reviewed ? (
+                            <Box sx={{ mt: 2 }}>
+                              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+                                Rate your experience
+                              </Typography>
+                              <Rating
+                                value={Number(draft.rating) || 0}
+                                precision={1}
+                                onChange={(_, nextValue) => {
+                                  handleDraftChange(itemKey, { rating: nextValue || 0 });
+                                }}
+                              />
+                              <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                placeholder="Write a helpful review (optional)"
+                                value={draft.comment || ''}
+                                onChange={(event) => handleDraftChange(itemKey, { comment: event.target.value })}
+                                sx={{ mt: 1.5 }}
+                              />
+                              <Button
+                                variant="contained"
+                                sx={{ mt: 1.5, backgroundColor: '#000', '&:hover': { backgroundColor: '#222' } }}
+                                onClick={() => handleSubmitReview(item)}
+                              >
+                                Submit Review
+                              </Button>
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" sx={{ mt: 1.5, color: 'success.main', fontWeight: 600 }}>
+                              Thank you. Your review has been recorded.
+                            </Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </Stack>
+              )}
             </Box>
           )}
 

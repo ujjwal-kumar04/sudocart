@@ -64,7 +64,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCart } from "../components/cartContext";
 import { getProductById } from "../service/api";
-import "./Productdetail.css";
 
 export default function Productcarddetails() {
   const { id } = useParams();
@@ -105,6 +104,9 @@ export default function Productcarddetails() {
   }
 
   if (!product) return <h2>Product Not Found</h2>;
+
+  const ratingAverage = Number(product.ratingAverage || 0);
+  const ratingCount = Number(product.ratingCount || 0);
 
   const handleBuyNow = () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"))?.user;
@@ -171,7 +173,10 @@ export default function Productcarddetails() {
 
       <div className="info-section">
         <h2>{product.name}</h2>
-        <p className="rating">★★★★☆ <span>(4.3)</span></p>
+        <p className="rating">
+          {ratingCount > 0 ? `${ratingAverage.toFixed(1)} / 5` : 'No ratings yet'}
+          <span> ({ratingCount} review{ratingCount === 1 ? '' : 's'})</span>
+        </p>
 
         <p className="description">
           Premium cotton shirt with a perfect fit, soft feel, and modern look.
@@ -215,6 +220,26 @@ export default function Productcarddetails() {
         <div className="actions">
           <button className="add-to-cart" onClick={() => addToCart(product)}>Add to Cart</button>
           <button className="buy-now" onClick={handleBuyNow}>Buy Now</button>
+        </div>
+
+        <div className="reviews-section">
+          <h3>Customer Reviews</h3>
+          {!product.reviews || product.reviews.length === 0 ? (
+            <p className="no-reviews">Be the first to review this product after delivery.</p>
+          ) : (
+            <div className="reviews-list">
+              {product.reviews.slice().reverse().slice(0, 8).map((review) => (
+                <div key={review._id} className="review-item">
+                  <div className="review-head">
+                    <strong>{review.userName}</strong>
+                    <span>{new Date(review.createdAt).toLocaleDateString('en-IN')}</span>
+                  </div>
+                  <div className="review-rating">Rating: {review.rating} / 5</div>
+                  {review.comment ? <p>{review.comment}</p> : <p className="no-comment">No comment</p>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
