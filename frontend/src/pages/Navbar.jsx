@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import logo from "../Assets/Slider/logo.png";
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
+import logo from "../logo.svg";
 import { getAllProducts } from "../service/api";
 
 import {
@@ -144,7 +144,7 @@ function Navbar() {
     <>
       <nav className="navbar">
         <div className="navbar1">
-          <div className="logo"><img src={logo}></img><h1>SudoCart</h1> </div>
+          <div className="logo"><img src={logo} alt="SudoCart logo"></img><h1>SudoCart</h1> </div>
 <div className="search1"></div>
           <div className="search-box">
             <input

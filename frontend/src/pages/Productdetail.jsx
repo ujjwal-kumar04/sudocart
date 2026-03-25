@@ -59,7 +59,7 @@
 //   );
 // }
 // src/ProductcardDetails.jsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCart } from "../components/cartContext";
@@ -73,11 +73,7 @@ export default function Productcarddetails() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await getProductById(id);
       setProduct(response.data);
@@ -87,17 +83,11 @@ export default function Productcarddetails() {
       console.error('Error fetching product:', error);
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  // Get all images (main + additional)
-  const getAllImages = () => {
-    if (!product) return [];
-    const images = [product.img];
-    if (product.images && product.images.length > 0) {
-      images.push(...product.images);
-    }
-    return images;
-  };
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   if (loading) {
     return <div style={{textAlign: 'center', padding: '50px'}}><h2>Loading...</h2></div>;

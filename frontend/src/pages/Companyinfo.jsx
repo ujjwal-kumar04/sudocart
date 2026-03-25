@@ -1,17 +1,19 @@
 // src/pages/Companyinfo.jsx
 import { useNavigate } from "react-router-dom";
-import badge from "../Assets/badge.png";
-import discount from "../Assets/discount.png";
-import lock from "../Assets/lock.png";
-import shipping from "../Assets/shipping.png";
+import logo from "../logo.svg";
 // src/pages/Companyinfo.jsx
+
+const badge = logo;
+const discount = logo;
+const lock = logo;
+const shipping = logo;
 
 
 const teamMembers = [
     {
         name: "Amanda Lee",
         role: "Creative Head",
-        img: "../Assets/lock.png",
+        img: logo,
     },
     {
         name: "Lee Stoner",
